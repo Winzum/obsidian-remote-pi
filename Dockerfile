@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-rdesktop-web:focal
+FROM ghcr.io/linuxserver/baseimage-rdesktop-web:arm64v8-focal
 
 LABEL org.opencontainers.image.authors="github@sytone.com"
 LABEL org.opencontainers.image.source="https://github.com/sytone/obsidian-remote"
@@ -11,6 +11,7 @@ RUN \
         apt-get update && \
         apt-get install -y --no-install-recommends \
             # Packages needed to download and extract obsidian.
+            #glibc \
             curl \
             libnss3 \
             # Install Chrome dependencies.
@@ -29,14 +30,18 @@ ARG OBSIDIAN_VERSION=0.15.9
 RUN \
     echo "**** download obsidian ****" && \
         curl \
-        https://github.com/obsidianmd/obsidian-releases/releases/download/v$OBSIDIAN_VERSION/Obsidian-$OBSIDIAN_VERSION.AppImage \
+        #https://github.com/obsidianmd/obsidian-releases/releases/download/v$OBSIDIAN_VERSION/Obsidian-$OBSIDIAN_VERSION-arm64.AppImage \
+        https://github.com/obsidianmd/obsidian-releases/releases/download/v0.15.9/obsidian-0.15.9-arm64.tar.gz  \
         -L \
-        -o obsidian.AppImage
+        -o obsidian.tar.gz
 
 RUN \
     echo "**** extract obsidian ****" && \
-        chmod +x /obsidian.AppImage && \
-        /obsidian.AppImage --appimage-extract
+        #chmod +x obsidian.AppImage && \
+        ls -a && \
+        pwd && \
+        mkdir squashfs-root/ && \
+        tar -xvf obsidian.tar.gz -C squashfs-root/ --strip-components=1
 
 ENV \
     CUSTOM_PORT="8080" \
